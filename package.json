@@ -1,6 +1,6 @@
 {
   "name": "nestjs-boilerplate",
-  "version": "0.0.4",
+  "version": "0.0.2",
   "description": "",
   "author": "David A. Gomez Rueda",
   "private": true,
@@ -21,7 +21,7 @@
     "release": "standard-version",
     "release:patch": "standard-version --release --prerelease=patch",
     "release:minor": "standard-version --release --prerelease=minor",
-    "release:major": "standard-version --release --prerelease=major "
+    "release:major": "standard-version --release --prerelease=major"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

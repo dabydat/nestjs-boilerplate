@@ -7,9 +7,9 @@ import { AppService } from "./app.service";
 import { MenuModule } from "./modules/security/menu/menu.module";
 import { RoleModule } from "./modules/security/role/role.module";
 import { UserModule } from "./modules/security/user/user.module";
-import { LoggingInterceptor } from "./common/interceptors/logging/logging.interceptor";
+import { LoggingInterceptor } from "./services/logger/interceptors/logging.interceptor";
 import { APP_INTERCEPTOR } from "@nestjs/core";
-import { CustomLogger } from "./common/services/custom.logger";
+import { CustomLogger } from "./services/logger/custom.logger";
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { CustomLogger } from "./common/services/custom.logger";
       synchronize: true
     }),
     // MenuModule,
-    // RoleModule,
+    RoleModule,
     UserModule
   ],
   controllers: [AppController],

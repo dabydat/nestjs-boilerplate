@@ -2,7 +2,9 @@ import { appendFile, writeFile, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 import { Injectable } from '@nestjs/common';
-import { LogColorsEnum, LogLevelEnum, ILogMetadata } from '../interfaces/Log.enum';
+import { LogMetadata } from './interfaces/LogMetadata.interface';
+import { LogColorsEnum } from './enums/LogColors.enum';
+import { LogLevelEnum } from './enums/LogLevel.enum';
 
 @Injectable()
 export class CustomLogger {
@@ -23,33 +25,33 @@ export class CustomLogger {
     /**
      * Logs an error message with the given metadata and context.
      *
-     * @param {ILogMetadata} metadata - the metadata for the error log
+     * @param {LogMetadata} metadata - the metadata for the error log
      * @param {any} context - optional context for the error log
      * @return {void} 
      */
-    public error(metadata: ILogMetadata, context?: any): void {
+    public error(metadata: LogMetadata, context?: any): void {
         this.log(LogLevelEnum.ERROR, metadata, context);
     }
 
     /**
      * Warns about the log with the given metadata and context.
      *
-     * @param {ILogMetadata} metadata - the metadata for the log
+     * @param {LogMetadata} metadata - the metadata for the log
      * @param {any} context - the context for the log
      * @return {void} 
      */
-    public warn(metadata: ILogMetadata, context?: any): void {
+    public warn(metadata: LogMetadata, context?: any): void {
         this.log(LogLevelEnum.WARNING, metadata, context);
     }
 
     /**
      * Logs an information message.
      *
-     * @param {ILogMetadata} metadata - the metadata for the log
+     * @param {LogMetadata} metadata - the metadata for the log
      * @param {any} [context] - optional context for the log
      * @return {void} 
      */
-    public info(metadata: ILogMetadata, context?: any): void {
+    public info(metadata: LogMetadata, context?: any): void {
         this.log(LogLevelEnum.INFO, metadata, context);
     }
 
@@ -57,10 +59,10 @@ export class CustomLogger {
      * A private function for logging messages at different levels.
      *
      * @param {LogLevelEnum} level - the log level
-     * @param {ILogMetadata} metadata - the log metadata
+     * @param {LogMetadata} metadata - the log metadata
      * @param {any} [context] - an optional context
      */
-    private log(level: LogLevelEnum, metadata: ILogMetadata, context?: any): void {
+    private log(level: LogLevelEnum, metadata: LogMetadata, context?: any): void {
         let logColor = '';
         let logLevel = '';
         let consoleFunc = (e:string) => {};
@@ -97,11 +99,11 @@ export class CustomLogger {
      *
      * @param {string} logColor - the color of the log entry
      * @param {string} logLevel - the level of the log entry
-     * @param {ILogMetadata} metadata - the metadata for the log entry
+     * @param {LogMetadata} metadata - the metadata for the log entry
      * @param {any} [context] - optional context for the log entry
      * @return {string} the generated log entry
      */
-    private getLogEntry(logColor: string, logLevel: string, metadata: ILogMetadata, context?: any): string {
+    private getLogEntry(logColor: string, logLevel: string, metadata: LogMetadata, context?: any): string {
         if (context) {
             return `${LogColorsEnum.magenta}[Dalogger] [${this.generateCorrelationId()}] - ${LogColorsEnum.close}${this.generateDate()} ${logColor} ${logLevel} [${JSON.stringify(context)}] [UserIP: ${metadata.clientIp} URL:${metadata.url}] [${metadata.controller} - ${metadata.method}] ${LogColorsEnum.close}${LogColorsEnum.magenta}+${metadata.miliseconds}${LogColorsEnum.close}\n`;
         } else {
@@ -109,6 +111,11 @@ export class CustomLogger {
         }
     }
 
+    /**
+     * Generates a unique correlation ID using a combination of random number and current timestamp.
+     *
+     * @return {string} the generated correlation ID
+     */
     generateCorrelationId(): string {
         return Math.random().toString(32).substring(2) + Date.now().toString(32)
     }
@@ -141,6 +148,13 @@ export class CustomLogger {
         return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
     }
 
+    /**
+     * Generate directories based on the type of log entry.
+     *
+     * @param {string} type - the type of log entry
+     * @param {string} logEntry - the log entry to be written
+     * @return {void} 
+     */
     private generateDirectories(type: string, logEntry: string): void {
         if (type === 'log') {
             if (!existsSync(this.logDir)) { mkdirSync(this.logDir, { recursive: true }); }

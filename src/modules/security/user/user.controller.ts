@@ -16,7 +16,6 @@ export class UserController {
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
-    this.logger.log('All users was requested');
     return this.userService.findAll(paginationDto);
   }
 

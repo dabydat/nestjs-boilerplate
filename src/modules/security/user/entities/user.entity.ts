@@ -1,20 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { IsString, IsEmail, IsNotEmpty } from "class-validator";
+import { Role } from "../../role/entities/role.entity";
 
 @Entity({ schema: 'security' })
 export class User {
-    @PrimaryGeneratedColumn('increment')
+    @PrimaryGeneratedColumn()
     id: number;
 
     @IsString()
     @IsNotEmpty()
     @Column('text')
-    name: string;;
+    name: string;
 
     @IsString()
     @IsNotEmpty()
     @Column('text')
-    lastName: string;;
+    lastName: string;
 
     @IsString()
     @IsNotEmpty()
@@ -39,4 +40,7 @@ export class User {
 
     @DeleteDateColumn({ type: 'timestamp', default: null })
     deletedAt: Date;
+
+    @ManyToOne(() => Role, role => role.users)
+    role: Role;
 }

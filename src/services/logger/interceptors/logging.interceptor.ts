@@ -1,6 +1,6 @@
-import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { CustomLogger } from 'src/common/services/custom.logger';
+import { CustomLogger } from 'src/services/logger/custom.logger';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -22,12 +22,9 @@ export class LoggingInterceptor implements NestInterceptor {
       clientIp, controller: controllerInstantiated, method: methodInstantiated, url: req.url, miliseconds: `${Date.now() - now}ms`
     }
     this.customLogger.info(metadata);
-    // return next.handle().pipe(
-    //   tap(() => {
-    //     this.customLogger.info(clientIp, controllerInstantiated, methodInstantiated, req.url, `${Date.now() - now}ms`);
-    //   }),
-    // );
-    return next.handle();
+    return next.handle().pipe(
+      tap(() => {this.customLogger.info({...metadata, miliseconds: `${Date.now() - now}ms`});}));
+    // return next.handle();
   }
 
   /**

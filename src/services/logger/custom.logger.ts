@@ -29,8 +29,19 @@ export class CustomLogger {
      * @param {any} context - optional context for the error log
      * @return {void} 
      */
+    public log(metadata: LogMetadata, context?: any): void {
+        this.createLog(LogLevelEnum.LOG, metadata, context);
+    }
+
+    /**
+     * Logs an error message with the given metadata and context.
+     *
+     * @param {LogMetadata} metadata - the metadata for the error log
+     * @param {any} context - optional context for the error log
+     * @return {void} 
+     */
     public error(metadata: LogMetadata, context?: any): void {
-        this.log(LogLevelEnum.ERROR, metadata, context);
+        this.createLog(LogLevelEnum.ERROR, metadata, context);
     }
 
     /**
@@ -41,7 +52,7 @@ export class CustomLogger {
      * @return {void} 
      */
     public warn(metadata: LogMetadata, context?: any): void {
-        this.log(LogLevelEnum.WARNING, metadata, context);
+        this.createLog(LogLevelEnum.WARNING, metadata, context);
     }
 
     /**
@@ -52,7 +63,7 @@ export class CustomLogger {
      * @return {void} 
      */
     public info(metadata: LogMetadata, context?: any): void {
-        this.log(LogLevelEnum.INFO, metadata, context);
+        this.createLog(LogLevelEnum.INFO, metadata, context);
     }
 
     /**
@@ -62,7 +73,7 @@ export class CustomLogger {
      * @param {LogMetadata} metadata - the log metadata
      * @param {any} [context] - an optional context
      */
-    private log(level: LogLevelEnum, metadata: LogMetadata, context?: any): void {
+    private createLog(level: LogLevelEnum, metadata: LogMetadata, context?: any): void {
         let logColor = '';
         let logLevel = '';
         let consoleFunc = (e:string) => {};

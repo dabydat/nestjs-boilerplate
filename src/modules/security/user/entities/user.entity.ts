@@ -1,34 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany } from "typeorm";
-import { IsString, IsEmail, IsNotEmpty } from "class-validator";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, BeforeInsert, BeforeUpdate } from "typeorm";
 import { Role } from "../../role/entities/role.entity";
+import * as bcrypt from "bcrypt";
 
 @Entity({ schema: 'security' })
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @IsString()
-    @IsNotEmpty()
     @Column('text')
     name: string;
 
-    @IsString()
-    @IsNotEmpty()
     @Column('text')
     lastName: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @Column('text')
+    @Column('text', { unique: true })
     username: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    @Column('text')
+    @Column('text', { unique: true })
     email: string;
 
-    @IsString()
-    @IsNotEmpty()
     @Column('text')
     password: string;
 
@@ -43,4 +33,15 @@ export class User {
 
     @ManyToOne(() => Role, role => role.users)
     role: Role;
+
+    @BeforeInsert()
+    checkFieldsBeforeInsert() {
+        this.email = this.email.toLocaleLowerCase().trim();
+        this.password = bcrypt.hashSync(this.password, 10);
+    }
+
+    @BeforeUpdate()
+    checkFieldsBeforeUpdate() {
+        this.checkFieldsBeforeInsert();
+    }
 }

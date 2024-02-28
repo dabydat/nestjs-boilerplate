@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, BeforeInsert, BeforeUpdate } from "typeorm";
 import { Role } from "../../role/entities/role.entity";
-import * as bcrypt from "bcrypt";
 
 @Entity({ schema: 'security' })
 export class User {
@@ -22,6 +21,9 @@ export class User {
     @Column('text')
     password: string;
 
+    @Column('boolean', { default: true })
+    isActive: boolean;
+
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
@@ -37,7 +39,6 @@ export class User {
     @BeforeInsert()
     checkFieldsBeforeInsert() {
         this.email = this.email.toLocaleLowerCase().trim();
-        this.password = bcrypt.hashSync(this.password, 10);
     }
 
     @BeforeUpdate()

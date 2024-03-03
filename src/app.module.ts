@@ -8,8 +8,9 @@ import { MenuModule } from "./modules/security/menu/menu.module";
 import { RoleModule } from "./modules/security/role/role.module";
 import { UserModule } from "./modules/security/user/user.module";
 import { LoggingInterceptor } from "./services/logger/interceptors/logging.interceptor";
-import { APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { CustomLogger } from "./services/logger/custom.logger";
+import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception.filter";
 
 @Module({
   imports: [
@@ -29,11 +30,16 @@ import { CustomLogger } from "./services/logger/custom.logger";
     UserModule
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     CustomLogger,
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     }
   ], 
   exports: [CustomLogger]

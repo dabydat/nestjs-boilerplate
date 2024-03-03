@@ -26,44 +26,40 @@ export class CustomLogger {
      * Logs an error message with the given metadata and context.
      *
      * @param {LogMetadata} metadata - the metadata for the error log
-     * @param {any} context - optional context for the error log
      * @return {void} 
      */
-    public log(metadata: LogMetadata, context?: any): void {
-        this.createLog(LogLevelEnum.LOG, metadata, context);
+    public log(metadata: LogMetadata): void {
+        this.createLog(LogLevelEnum.LOG, metadata);
     }
 
     /**
      * Logs an error message with the given metadata and context.
      *
      * @param {LogMetadata} metadata - the metadata for the error log
-     * @param {any} context - optional context for the error log
      * @return {void} 
      */
-    public error(metadata: LogMetadata, context?: any): void {
-        this.createLog(LogLevelEnum.ERROR, metadata, context);
+    public error(metadata: LogMetadata): void {
+        this.createLog(LogLevelEnum.ERROR, metadata);
     }
 
     /**
      * Warns about the log with the given metadata and context.
      *
      * @param {LogMetadata} metadata - the metadata for the log
-     * @param {any} context - the context for the log
      * @return {void} 
      */
-    public warn(metadata: LogMetadata, context?: any): void {
-        this.createLog(LogLevelEnum.WARNING, metadata, context);
+    public warn(metadata: LogMetadata): void {
+        this.createLog(LogLevelEnum.WARNING, metadata);
     }
 
     /**
      * Logs an information message.
      *
      * @param {LogMetadata} metadata - the metadata for the log
-     * @param {any} [context] - optional context for the log
      * @return {void} 
      */
-    public info(metadata: LogMetadata, context?: any): void {
-        this.createLog(LogLevelEnum.INFO, metadata, context);
+    public info(metadata: LogMetadata): void {
+        this.createLog(LogLevelEnum.INFO, metadata);
     }
 
     /**
@@ -71,12 +67,11 @@ export class CustomLogger {
      *
      * @param {LogLevelEnum} level - the log level
      * @param {LogMetadata} metadata - the log metadata
-     * @param {any} [context] - an optional context
      */
-    private createLog(level: LogLevelEnum, metadata: LogMetadata, context?: any): void {
+    private createLog(level: LogLevelEnum, metadata: LogMetadata): void {
         let logColor = '';
         let logLevel = '';
-        let consoleFunc = (e:string) => {};
+        let consoleFunc = (e: string) => { };
         switch (level) {
             case 'error':
                 logColor = LogColorsEnum.red;
@@ -99,28 +94,27 @@ export class CustomLogger {
                 consoleFunc = console.log;
         }
 
-        const logEntry = this.getLogEntry(logColor, logLevel, metadata, context);
+        const logEntry = this.getLogEntry(logColor, logLevel, metadata);
         this.generateDirectories('log', logEntry);
         this.generateDirectories('audit', logEntry);
         consoleFunc(logEntry);
     }
 
+
     /**
-     * Generates a log entry with the given color, level, metadata, and optional context.
+     * Generates a log entry with the given parameters.
      *
      * @param {string} logColor - the color of the log entry
      * @param {string} logLevel - the level of the log entry
      * @param {LogMetadata} metadata - the metadata for the log entry
-     * @param {any} [context] - optional context for the log entry
-     * @return {string} the generated log entry
+     * @returns {string} the generated log entry
      */
-    private getLogEntry(logColor: string, logLevel: string, metadata: LogMetadata, context?: any): string {
-        if (context) {
-            return `${LogColorsEnum.magenta}[Dalogger] [${this.generateCorrelationId()}] - ${LogColorsEnum.close}${this.generateDate()} ${logColor} ${logLevel} [${JSON.stringify(context)}] [UserIP: ${metadata.clientIp} URL:${metadata.url}] [${metadata.controller} - ${metadata.method}] ${LogColorsEnum.close}${LogColorsEnum.magenta}+${metadata.miliseconds}${LogColorsEnum.close}\n`;
-        } else {
-            return `${LogColorsEnum.magenta}[Dalogger] [${this.generateCorrelationId()}] - ${LogColorsEnum.close}${this.generateDate()} ${logColor} ${logLevel} [UserIP: ${metadata.clientIp} URL:${metadata.url}] [${metadata.controller} - ${metadata.method}] ${LogColorsEnum.close}${LogColorsEnum.magenta}+${metadata.miliseconds}${LogColorsEnum.close}\n`;
-        }
+    private getLogEntry(logColor: string, logLevel: string, metadata: LogMetadata): string {
+        const metadataEntries = Object.entries(metadata).map(([key, value]) => ` - ${key}: ${value}`);
+        const message = metadataEntries.join('\n');
+        return `\n${LogColorsEnum.green}[Dalogger] [${this.generateCorrelationId()}] - ${LogColorsEnum.close}${this.generateDate()} ${logColor} ${logLevel} ${message} ${LogColorsEnum.green} +${metadata.timestamp}`;
     }
+
 
     /**
      * Generates a unique correlation ID using a combination of random number and current timestamp.
@@ -170,13 +164,13 @@ export class CustomLogger {
         if (type === 'log') {
             if (!existsSync(this.logDir)) { mkdirSync(this.logDir, { recursive: true }); }
             appendFile(this.logFilePath, logEntry, (err) => {
-                if (err) { console.error('Error al escribir en el archivo de log:', err); }
+                if (err) { console.error('Error al escribir en el archivo log:', err); }
             });
         }
         if (type === 'audit') {
             if (!existsSync(this.auditDir)) { mkdirSync(this.auditDir, { recursive: true }); }
             writeFile(this.auditFilePath, JSON.stringify(logEntry, null, 2), (err) => {
-                if (err) { console.error('Error al escribir en el archivo de audit:', err); }
+                if (err) { console.error('Error al escribir en el archivo audit:', err); }
             });
         }
     }

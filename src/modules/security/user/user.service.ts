@@ -1,6 +1,6 @@
 import * as bcrypt from "bcrypt";
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
@@ -21,6 +21,14 @@ export class UserService {
       await this.userRepository.save(user);
       return { ...user };
     } catch (error) {
+      if (error.code === '22P02') {
+        throw new BadRequestException('At least one of the fields has an invalid value. Please check and try again.');
+      }
+
+      if (error.code === '23503') {
+        throw new BadRequestException(error.detail);
+      }
+
       console.log(error);
     }
   }
@@ -32,17 +40,22 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    const getUser: User = await this.userRepository.findOne({ where: { id }, relations: ['role'], select: ["id", "name", "lastName", "username", "email", "role"] });
-    const { role, ...user } = getUser;
-    // const user: User = await this.userRepository.findOne({ 
-    //   where: { id }, relations: ['role'], select: ["id", "name", "lastName", "username", "email", "role"]
-    // });
+    const user: User = await this.getUserById(id);
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
-    return { ...user, role: role.name };
+    const { role, ...finalUser } = user;
+    // const user: User = await this.userRepository.findOne({ where: { id }, relations: ['role'], select: ["id", "name", "lastName", "username", "email", "role"]});
+    return { ...finalUser, role: role.name };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) { throw new NotFoundException(`User with id ${id} not found`); }
+    const updatedUser = Object.assign(user, updateUserDto);
+    return this.userRepository.save(updatedUser);
+  }
+
+  private async getUserById(id: number) {
+    return await this.userRepository.findOne({ where: { id }, relations: ['role'], select: ["id", "name", "lastName", "username", "email", "role"] });
   }
 
   async remove(id: number) {

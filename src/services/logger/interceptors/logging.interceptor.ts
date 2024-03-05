@@ -16,11 +16,11 @@ export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
     const clientIp = this.getClientIp(req);
-    const controllerInstantiated = context.getClass().name; // Obtener la clase del controlador
-    const methodInstantiated = context.getHandler().name; // Obtener el identificador del método del controlador
+    const controller = context.getClass().name; // Obtener la clase del controlador
+    const method = context.getHandler().name; // Obtener el identificador del método del controlador
     const now = Date.now();
     const metadata: LogMetadata = {
-      clientIp, controller: controllerInstantiated, method: methodInstantiated, url: req.url, timestamp: `${Date.now() - now}ms`
+      clientIp, controller, method, url: req.url, timestamp: `${Date.now() - now}ms`
     }
     this.customLogger.info(metadata);
     return next.handle().pipe(

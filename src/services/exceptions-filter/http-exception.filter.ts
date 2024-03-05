@@ -11,18 +11,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const clientIp = this.getClientIp(req);
         const response = ctx.getResponse();
         const status = exception.getStatus();
-        let logMetadataException: LogMetadata = {
-            statusCode: status,
-            message: exception.message,
-            timestamp: new Date().toISOString(),
-        }
-
-        if (exception.message !== exception.getResponse()['message']) {
-            logMetadataException = { ...logMetadataException, validationError: exception.getResponse()['message'] }
-        }
-
-        this.customLogger.error({ clientIp, url: req.url, ...logMetadataException, stackTrace: exception.stack });
-        response.status(status).json({ ...logMetadataException });
+        const jsonResponse = this.buildResponse(exception)
+        this.customLogger.error({ clientIp, url: req.url, ...jsonResponse, stackTrace: exception.stack });
+        response.status(status).json(jsonResponse);
     }
 
     /**
@@ -34,5 +25,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
     getClientIp(req: any): string {
         const xForwardedFor = (req.headers['x-forwarded-for'] || '').split(',').pop() || req.connection.remoteAddress;
         return xForwardedFor.trim();
+    }
+
+    buildResponse(exception: HttpException): Object {
+        const responseException = exception.getResponse();
+        let logMetadataException: LogMetadata = {
+            statusCode: exception.getStatus(),
+            timestamp: new Date().toISOString(),
+        }
+
+        if (typeof responseException === 'object') {
+            logMetadataException = { ...logMetadataException, ...responseException }
+        }
+
+        return logMetadataException
     }
 }

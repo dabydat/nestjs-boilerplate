@@ -4,7 +4,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from '../role/entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { databaseErrors } from "src/common/utils/databaseErrorMessages";
+import { databaseErrorMessages } from "src/common/utils/databaseErrorMessages";
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class RoleService {
       await this.roleRepository.save(role);
       return role;
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrors[error.code], message: error.detail ? error.detail : error.message });
+      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail ? error.detail : error.message });
     }
   }
 
@@ -31,16 +31,30 @@ export class RoleService {
   }
 
   async findOne(id: number): Promise<Role> {
-    const role = await this.roleRepository.findOneBy({ id });
+    const role: Role = await this.roleRepository.findOneBy({ id });
     if (!role) throw new NotFoundException(`Role with id ${id} not found`);
     return role;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
+    const role: Role = await this.roleRepository.findOneBy({ id });
+    if (!role) throw new NotFoundException(`User with id ${id} not found`);
+    try {
+      const updatedRole = Object.assign(role, updateRoleDto);
+      return this.roleRepository.save(updatedRole);
+    } catch (error) {
+      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+    }
   }
-k
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+
+  async remove(id: number): Promise<Object> {
+    const role: Role = await this.roleRepository.findOneBy({ id });
+    if (!role) throw new NotFoundException({ message: `User with id ${id} not found` });
+    try {
+      const updatedRole: Role = await this.roleRepository.save({ id, isActive: false });
+      return { ...role, ...updatedRole };
+    } catch (error) {
+      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+    }
   }
 }

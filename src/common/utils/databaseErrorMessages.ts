@@ -1,4 +1,4 @@
-export const databaseErrors = {
+export const databaseErrorMessages = {
     "23505": {
         databaseErrorType: "UNIQUE_CONSTRAINT_VIOLATION",
         databaseErrorMessage: "The value exists in the table."

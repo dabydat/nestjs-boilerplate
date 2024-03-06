@@ -1,20 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Post()
-  create(@Body() createMenuDto: CreateMenuDto) {
+  create(@Body() createMenuDto: CreateMenuDto[]) {
     return this.menuService.create(createMenuDto);
   }
 
   @Get()
-  findAll() {
-    return this.menuService.findAll();
+  findAll(@Query() paginationDto: PaginationDto ) {
+    return this.menuService.findAll(paginationDto);
   }
 
   @Get(':id')

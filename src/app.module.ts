@@ -25,9 +25,9 @@ import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception
       autoLoadEntities: true,
       synchronize: true
     }),
-    // MenuModule,
     RoleModule,
-    UserModule
+    UserModule,
+    MenuModule,
   ],
   controllers: [AppController],
   providers: [

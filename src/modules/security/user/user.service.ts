@@ -1,13 +1,13 @@
 import * as bcrypt from "bcrypt";
 
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { User } from './entities/user.entity';
-import { databaseErrorMessages } from "src/common/utils/databaseErrorMessages";
+import { handleDatabaseErrorMessages } from "src/common/utils/databaseErrorMessages";
 
 @Injectable()
 export class UserService {
@@ -20,8 +20,8 @@ export class UserService {
       const user = this.userRepository.create({ ...createUserDto, password: bcrypt.hashSync(createUserDto.password, 10) });
       await this.userRepository.save(user);
       return user;
-    } catch (error) {      
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail ? error.detail : error.message });
+    } catch (error) {
+      throw handleDatabaseErrorMessages(error);
     }
   }
 
@@ -45,7 +45,7 @@ export class UserService {
       const updatedUser = Object.assign(user, updateUserDto);
       return this.userRepository.save(updatedUser);
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+      throw handleDatabaseErrorMessages(error);
     }
   }
 
@@ -60,7 +60,7 @@ export class UserService {
       const userUpdated: User = await this.userRepository.save({ id, isActive: false });
       return { ...user, ...userUpdated };
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+      throw handleDatabaseErrorMessages(error);
     }
   }
 }

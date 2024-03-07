@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from '../role/entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { databaseErrorMessages } from "src/common/utils/databaseErrorMessages";
+import { handleDatabaseErrorMessages } from "src/common/utils/databaseErrorMessages";
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class RoleService {
       await this.roleRepository.save(role);
       return role;
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail ? error.detail : error.message });
+      throw handleDatabaseErrorMessages(error);
     }
   }
 
@@ -43,7 +43,7 @@ export class RoleService {
       const updatedRole = Object.assign(role, updateRoleDto);
       return this.roleRepository.save(updatedRole);
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+      throw handleDatabaseErrorMessages(error);
     }
   }
 
@@ -54,7 +54,7 @@ export class RoleService {
       const updatedRole: Role = await this.roleRepository.save({ id, isActive: false });
       return { ...role, ...updatedRole };
     } catch (error) {
-      throw new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail });
+      throw handleDatabaseErrorMessages(error);
     }
   }
 }

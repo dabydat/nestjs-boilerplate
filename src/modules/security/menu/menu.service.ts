@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { ConfigService } from '@nestjs/config';
+import { handleDatabaseErrorMessages } from "src/common/utils/databaseErrorMessages";
 
 @Injectable()
 export class MenuService {
@@ -46,17 +47,21 @@ export class MenuService {
     return relations;
   }
 
-  
+
   private async createMenu(createMenuDto: CreateMenuDto, parentMenu?: Menu): Promise<Menu> {
-    const newMenu = this.menuRepository.create(createMenuDto);
-    newMenu.parent = parentMenu;
-    const savedMenu = await this.menuRepository.save(newMenu);
-  
-    if (createMenuDto.children) {
-      for (const childMenuDto of createMenuDto.children) {
-        await this.createMenu(childMenuDto, savedMenu);
+    try {
+      const newMenu = this.menuRepository.create(createMenuDto);
+      newMenu.parent = parentMenu;
+      const savedMenu = await this.menuRepository.save(newMenu);
+
+      if (createMenuDto.children) {
+        for (const childMenuDto of createMenuDto.children) {
+          await this.createMenu(childMenuDto, savedMenu);
+        }
       }
+      return savedMenu;
+    } catch (error) {
+      throw handleDatabaseErrorMessages(error);
     }
-    return savedMenu;
   }
 }

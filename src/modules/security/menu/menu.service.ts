@@ -1,26 +1,62 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
-import { UpdateMenuDto } from './dto/update-menu.dto';
+import { Menu } from './entities/menu.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MenuService {
-  create(createMenuDto: CreateMenuDto) {
-    return 'This action adds a new menu';
+  private menuLevelLimit: number;
+  constructor(
+    @InjectRepository(Menu) private readonly menuRepository: Repository<Menu>,
+    private readonly configService: ConfigService,
+  ) {
+    this.menuLevelLimit = this.configService.get<number>('MENU_LEVEL_LIMIT');
   }
 
-  findAll() {
-    return `This action returns all menu`;
+  async create(createMenuDto: CreateMenuDto[]): Promise<Menu[]> {
+    await this.menuRepository.clear();
+    const createdMenus: Menu[] = [];
+    for (const menuDto of createMenuDto) {
+      const createdMenu = await this.createMenu(menuDto);
+      createdMenus.push(createdMenu);
+    }
+    return createdMenus;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} menu`;
-  }
-
-  update(id: number, updateMenuDto: UpdateMenuDto) {
-    return `This action updates a #${id} menu`;
+  async findAll(paginationDto: PaginationDto): Promise<Menu[]> {
+    const { limit = 10, offset = 0 } = paginationDto;
+    const relations = this.getMenuRelations(this.menuLevelLimit);
+    const menus = await this.menuRepository.find({ take: limit, skip: offset, relations, order: { parentId: "ASC" } });
+    const menusFiltered = menus.filter(menu => menu.parentId === null);
+    return menusFiltered;
   }
 
   remove(id: number) {
     return `This action removes a #${id} menu`;
+  }
+
+  private getMenuRelations(level: number): string[] {
+    const relations: string[] = ['children']; // Relación inicial
+    for (let i = 1; i < level; i++) {
+      relations.push(relations[relations.length - 1] + '.children'); // Agregar la relación recursiva
+    }
+    return relations;
+  }
+
+  
+  private async createMenu(createMenuDto: CreateMenuDto, parentMenu?: Menu): Promise<Menu> {
+    const newMenu = this.menuRepository.create(createMenuDto);
+    newMenu.parent = parentMenu;
+    const savedMenu = await this.menuRepository.save(newMenu);
+  
+    if (createMenuDto.children) {
+      for (const childMenuDto of createMenuDto.children) {
+        await this.createMenu(childMenuDto, savedMenu);
+      }
+    }
+    return savedMenu;
   }
 }

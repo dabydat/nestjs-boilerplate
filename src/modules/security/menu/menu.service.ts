@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
-import { UpdateMenuDto } from './dto/update-menu.dto';
 import { Menu } from './entities/menu.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,14 +16,14 @@ export class MenuService {
     this.menuLevelLimit = this.configService.get<number>('MENU_LEVEL_LIMIT');
   }
 
-  async create(createMenuDto: CreateMenuDto[]) {
-    for (const menu of createMenuDto) {
-      const rootMenu = await this.createMenu(menu);
+  async create(createMenuDto: CreateMenuDto[]): Promise<Menu[]> {
+    await this.menuRepository.clear();
+    const createdMenus: Menu[] = [];
+    for (const menuDto of createMenuDto) {
+      const createdMenu = await this.createMenu(menuDto);
+      createdMenus.push(createdMenu);
     }
-    const relations = this.getMenuRelations(this.menuLevelLimit);
-    const menus = await this.menuRepository.find({ take: 10, skip: 0, relations, order: { parentId: "ASC" } });
-    const menusFiltered = menus.filter(menu => menu.parentId === null);
-    return menusFiltered;
+    return createdMenus;
   }
 
   async findAll(paginationDto: PaginationDto): Promise<Menu[]> {
@@ -33,14 +32,6 @@ export class MenuService {
     const menus = await this.menuRepository.find({ take: limit, skip: offset, relations, order: { parentId: "ASC" } });
     const menusFiltered = menus.filter(menu => menu.parentId === null);
     return menusFiltered;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} menu`;
-  }
-
-  update(id: number, updateMenuDto: UpdateMenuDto) {
-    return `This action updates a #${id} menu`;
   }
 
   remove(id: number) {
@@ -55,16 +46,17 @@ export class MenuService {
     return relations;
   }
 
-  public async createMenu(menuData: CreateMenuDto, parentMenuId: number | null = null): Promise<Menu> {
-    console.log(menuData);
-    
-    const menu = this.menuRepository.create(menuData);
-    if (parentMenuId) {
-      const parentMenu = await this.menuRepository.findOne({ where: { id: parentMenuId } });
-      if (parentMenu) {
-        menu.parent = parentMenu;
+  
+  private async createMenu(createMenuDto: CreateMenuDto, parentMenu?: Menu): Promise<Menu> {
+    const newMenu = this.menuRepository.create(createMenuDto);
+    newMenu.parent = parentMenu;
+    const savedMenu = await this.menuRepository.save(newMenu);
+  
+    if (createMenuDto.children) {
+      for (const childMenuDto of createMenuDto.children) {
+        await this.createMenu(childMenuDto, savedMenu);
       }
     }
-    return this.menuRepository.save(menu);
+    return savedMenu;
   }
 }

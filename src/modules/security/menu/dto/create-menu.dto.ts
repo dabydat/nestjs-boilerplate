@@ -1,34 +1,29 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
-import { Menu } from "../entities/menu.entity";
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateMenuDto {
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-    @IsBoolean()
-    @IsOptional()
-    isParent: boolean;
+  @IsNotEmpty()
+  @IsBoolean()
+  isParent: boolean;
 
-    @IsString()
-    @IsOptional()
-    parentId: number;
+  @IsOptional()
+  @IsString()
+  toLink?: string;
 
-    @IsString()
-    @IsOptional()
-    toLink: string;
+  @IsNotEmpty()
+  @IsNumber()
+  order: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    order: number;
+  @IsNotEmpty()
+  @IsBoolean()
+  isActive: boolean;
 
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
-
-    @IsOptional()
-    parent: Menu;
-
-    @IsOptional()
-    children: Menu[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMenuDto)
+  children?: CreateMenuDto[];
 }

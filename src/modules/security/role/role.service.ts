@@ -38,7 +38,7 @@ export class RoleService {
 
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
     const role: Role = await this.roleRepository.findOneBy({ id });
-    if (!role) throw new NotFoundException(`User with id ${id} not found`);
+    if (!role) throw new NotFoundException(`Role with id ${id} not found`);
     try {
       const updatedRole = Object.assign(role, updateRoleDto);
       return this.roleRepository.save(updatedRole);
@@ -49,7 +49,7 @@ export class RoleService {
 
   async remove(id: number): Promise<Object> {
     const role: Role = await this.roleRepository.findOneBy({ id });
-    if (!role) throw new NotFoundException({ message: `User with id ${id} not found` });
+    if (!role) throw new NotFoundException({ message: `Role with id ${id} not found` });
     try {
       const updatedRole: Role = await this.roleRepository.save({ id, isActive: false });
       return { ...role, ...updatedRole };

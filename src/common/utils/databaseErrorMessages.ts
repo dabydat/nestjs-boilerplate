@@ -1,4 +1,6 @@
-export const databaseErrorMessages = {
+import { BadRequestException } from "@nestjs/common";
+
+const databaseErrorMessages = {
     "23505": {
         databaseErrorType: "UNIQUE_CONSTRAINT_VIOLATION",
         databaseErrorMessage: "The value exists in the table."
@@ -15,4 +17,8 @@ export const databaseErrorMessages = {
         databaseErrorType: "NOT_NULL_VIOLATION",
         databaseErrorMessage: "The value cannot be null."
     }
+}
+
+export const handleDatabaseErrorMessages = (error: any) => {
+    return new BadRequestException({ ...databaseErrorMessages[error.code], message: error.detail ? error.detail : error.message });
 }

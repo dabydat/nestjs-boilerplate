@@ -9,7 +9,6 @@ import { User } from './entities/user.entity';
 @ApiTags('users')
 @Controller('user')
 export class UserController {
-  private readonly logger = new Logger('UserController')
   constructor(private readonly userService: UserService) { }
 
   @Post()

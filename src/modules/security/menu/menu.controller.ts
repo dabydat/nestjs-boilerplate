@@ -4,7 +4,7 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Menu } from './entities/menu.entity';
-import { createMenuApiBody } from 'src/services/swagger-documentation/menu/create-menu';
+import { createMenuApiBody } from 'src/modules/security/menu/documentation/create-menu';
 
 @ApiTags('menus')
 @Controller('menu')

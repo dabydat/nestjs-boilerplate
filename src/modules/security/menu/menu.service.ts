@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { Menu } from './entities/menu.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,8 +35,15 @@ export class MenuService {
     return menusFiltered;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} menu`;
+  async remove(id: number) {
+    const menu: Menu = await this.menuRepository.findOneBy({ id });
+    if (!menu) throw new NotFoundException({ message: `Menu with id ${id} not found` });
+    try {
+      const updatedmenu: Menu = await this.menuRepository.save({ id, isActive: false });
+      return { ...menu, ...updatedmenu };
+    } catch (error) {
+      throw handleDatabaseErrorMessages(error);
+    }
   }
 
   private getMenuRelations(level: number): string[] {

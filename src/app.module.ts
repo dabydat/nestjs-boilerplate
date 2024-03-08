@@ -11,6 +11,7 @@ import { LoggingInterceptor } from "./services/logger/interceptors/logging.inter
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { CustomLogger } from "./services/logger/custom.logger";
 import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception.filter";
+import { PermissionModule } from './modules/security/permission/permission.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception
     RoleModule,
     UserModule,
     MenuModule,
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [

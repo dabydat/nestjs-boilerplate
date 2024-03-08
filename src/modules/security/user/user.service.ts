@@ -25,10 +25,13 @@ export class UserService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<User[]> {
+  async findAll(paginationDto: PaginationDto): Promise<{ [key: string]: any }[]> {
     const { limit = 10, offset = 0 } = paginationDto;
-    const users = await this.userRepository.find({ take: limit, skip: offset });
-    return users;
+    const users = await this.userRepository.find({ take: limit, skip: offset, relations: ['role'], select: ["id", "name", "lastName", "username", "email", "role"] });
+    const finalUsers = users.map(user => {
+      return { ...user, role: user.role.name };
+    });
+    return finalUsers;
   }
 
   async findOne(id: number): Promise<any> {

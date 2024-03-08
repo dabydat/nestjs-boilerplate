@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { RolePermission } from '../../role-permission/entities/role-permission.entity';
 
 @Entity({ schema: 'security' })
 export class Permission {
@@ -26,4 +27,7 @@ export class Permission {
     @ApiProperty({ description: 'The deletion date of the permission.' })
     @DeleteDateColumn({ type: 'timestamp', default: null })
     deletedAt: Date;
+
+    @OneToMany(() => RolePermission, rolePermission => rolePermission.permission)
+    rolePermissions: RolePermission[];
 }

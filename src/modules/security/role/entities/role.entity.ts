@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { RolePermission } from '../../role-permission/entities/role-permission.entity';
 
 @Entity({ schema: 'security' })
 export class Role {
@@ -30,6 +31,9 @@ export class Role {
   @ApiProperty({ description: 'The deletion date of the role.' })
   @DeleteDateColumn({ type: 'timestamp', default: null })
   deletedAt: Date;
+
+  @OneToMany(() => RolePermission, rolePermission => rolePermission.role)
+  rolePermissions: RolePermission[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

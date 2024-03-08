@@ -44,7 +44,7 @@ export class User {
     @DeleteDateColumn({ type: 'timestamp', default: null })
     deletedAt: Date;
 
-    @ApiProperty({ description: 'The role of the user.',  type: () => Role })
+    @ApiProperty({ description: 'The role ID of the user.', type: 'number' })
     @ManyToOne(() => Role, role => role.users)
     role: Role;
 

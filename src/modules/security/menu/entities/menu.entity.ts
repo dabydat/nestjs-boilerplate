@@ -20,7 +20,6 @@ export class Menu {
     @Column({ nullable: true })
     parentId: number;
 
-    @ApiProperty({ description: 'The parent menu.' })
     @ManyToOne(() => Menu, menu => menu.children, { nullable: true })
     parent: Menu;
 

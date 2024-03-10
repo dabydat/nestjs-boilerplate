@@ -12,24 +12,18 @@ import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { CustomLogger } from "./services/logger/custom.logger";
 import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception.filter";
 import { PermissionModule } from './modules/security/permission/permission.module';
+import { RolePermissionModule } from './modules/security/role-permission/role-permission.module';
+import { DataSourceConfig } from './common/config/data.source';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      database: process.env.DB_NAME,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      autoLoadEntities: true,
-      synchronize: true
-    }),
+    TypeOrmModule.forRoot({...DataSourceConfig, autoLoadEntities: true}),
     RoleModule,
     UserModule,
     MenuModule,
     PermissionModule,
+    RolePermissionModule,
   ],
   controllers: [AppController],
   providers: [

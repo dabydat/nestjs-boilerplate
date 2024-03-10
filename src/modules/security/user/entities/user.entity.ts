@@ -1,13 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, BeforeInsert, BeforeUpdate } from "typeorm";
+import { Entity, Column, ManyToOne, BeforeInsert, BeforeUpdate } from "typeorm";
 import { Role } from "../../role/entities/role.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { BaseEntity } from "src/common/config/base.entity";
 
 @Entity({ schema: 'security' })
-export class User {
-    @ApiProperty({ description: 'The id of the user.' })
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class User extends BaseEntity {
     @ApiProperty({ description: 'The name of the user.' })
     @Column('text')
     name: string;
@@ -27,22 +24,6 @@ export class User {
     @ApiProperty({ description: 'The password of the user.' })
     @Column('text')
     password: string;
-
-    @ApiProperty({ description: 'A boolean to identify if a user is active.' })
-    @Column('boolean', { default: true })
-    isActive: boolean;
-
-    @ApiProperty({ description: 'The creation date of the user.' })
-    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
-
-    @ApiProperty({ description: 'The update date of the user.' })
-    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-    updatedAt: Date;
-
-    @ApiProperty({ description: 'The deletion date of the user.' })
-    @DeleteDateColumn({ type: 'timestamp', default: null })
-    deletedAt: Date;
 
     @ApiProperty({ description: 'The role ID of the user.', type: 'number' })
     @ManyToOne(() => Role, role => role.users)

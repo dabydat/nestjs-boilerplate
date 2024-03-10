@@ -54,7 +54,6 @@ export class MenuService {
     return relations;
   }
 
-
   private async createMenu(createMenuDto: CreateMenuDto, parentMenu?: Menu): Promise<Menu> {
     try {
       const newMenu = this.menuRepository.create(createMenuDto);

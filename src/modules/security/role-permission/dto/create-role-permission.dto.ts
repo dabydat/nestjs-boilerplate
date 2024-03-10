@@ -6,7 +6,7 @@ export class CreateRolePermissionDto {
     @IsNotEmpty()
     roleId: number;
 
-    @ApiProperty({ description: 'The id of the permission.' })
+    @ApiProperty({ description: 'The id of the permissions to asign to the role.' })
     @IsNotEmpty()
-    permissionId: number;
+    permissionsId: number[];
 }

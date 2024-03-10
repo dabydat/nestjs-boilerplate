@@ -1,36 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, Column, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { RolePermission } from '../../role-permission/entities/role-permission.entity';
+import { BaseEntity } from 'src/common/config/base.entity';
 
 @Entity({ schema: 'security' })
-export class Role {
-  @ApiProperty({ description: 'The id of the role.' })
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Role extends BaseEntity {
   @ApiProperty({ description: 'The name of the role.' })
   @Column({ unique: true })
   name: string;
 
   @OneToMany(() => User, user => user.role)
   users: User[];
-
-  @ApiProperty({ description: 'A boolean to identify if a role is active.' })
-  @Column({ default: true })
-  isActive: boolean;
-
-  @ApiProperty({ description: 'The creation date of the role.' })
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
-
-  @ApiProperty({ description: 'The update date of the role.' })
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
-
-  @ApiProperty({ description: 'The deletion date of the role.' })
-  @DeleteDateColumn({ type: 'timestamp', default: null })
-  deletedAt: Date;
 
   @OneToMany(() => RolePermission, rolePermission => rolePermission.role)
   rolePermissions: RolePermission[];

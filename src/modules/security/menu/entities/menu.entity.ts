@@ -1,13 +1,9 @@
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity } from "src/common/config/base.entity";
 
 @Entity({ schema: 'security' })
-export class Menu {
-
-    @ApiProperty({ description: 'The id of the menu.' })
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class Menu extends BaseEntity {
     @ApiProperty({ description: 'The name of the menu.' })
     @Column({ unique: true })
     name: string;
@@ -34,20 +30,4 @@ export class Menu {
     @ApiProperty({ description: 'The order of the menu.' })
     @Column()
     order: number;
-
-    @ApiProperty({ description: 'A boolean to identify if a menu is active.' })
-    @Column({ default: true })
-    isActive: boolean;
-
-    @ApiProperty({ description: 'The creation date of the menu.' })
-    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
-
-    @ApiProperty({ description: 'The update date of the menu.' })
-    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-    updatedAt: Date;
-
-    @ApiProperty({ description: 'The delete date of the menu.' })
-    @DeleteDateColumn({ type: 'timestamp', default: null })
-    deletedAt: Date;
 }

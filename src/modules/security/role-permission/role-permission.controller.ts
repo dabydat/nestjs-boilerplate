@@ -1,34 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { RolePermissionService } from './role-permission.service';
 import { CreateRolePermissionDto } from './dto/create-role-permission.dto';
 import { UpdateRolePermissionDto } from './dto/update-role-permission.dto';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('role-permission')
 export class RolePermissionController {
   constructor(private readonly rolePermissionService: RolePermissionService) {}
 
   @Post()
-  create(@Body() createRolePermissionDto: CreateRolePermissionDto) {
+  create(@Body() createRolePermissionDto: CreateRolePermissionDto[]) {
     return this.rolePermissionService.create(createRolePermissionDto);
   }
 
   @Get()
-  findAll() {
-    return this.rolePermissionService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.rolePermissionService.findAll(paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolePermissionService.findOne(+id);
+  @Get('permissions/:roleId')
+  getPermissionsByRoleId(@Param('roleId') id: string) {
+    return this.rolePermissionService.getPermissionsByRoleId(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRolePermissionDto: UpdateRolePermissionDto) {
-    return this.rolePermissionService.update(+id, updateRolePermissionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolePermissionService.remove(+id);
+  @Get('roles/:permissionId')
+  findOne(@Param('permissionId') id: string) {
+    return this.rolePermissionService.getRolesByPermissionId(+id);
   }
 }

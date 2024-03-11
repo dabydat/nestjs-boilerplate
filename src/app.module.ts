@@ -14,6 +14,7 @@ import { HttpExceptionFilter } from "./services/exceptions-filter/http-exception
 import { PermissionModule } from './modules/security/permission/permission.module';
 import { RolePermissionModule } from './modules/security/role-permission/role-permission.module';
 import { DataSourceConfig } from './common/config/data.source';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DataSourceConfig } from './common/config/data.source';
     MenuModule,
     PermissionModule,
     RolePermissionModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
